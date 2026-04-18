@@ -1,0 +1,159 @@
+{
+  "info": {
+    "name": "Laundry OMS API",
+    "description": "All endpoints for the Laundry Order Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3001/api",
+      "type": "string"
+    },
+    {
+      "key": "order_id",
+      "value": "LC-REPLACE",
+      "type": "string",
+      "description": "Paste a real order ID here after creating one"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3001/health",
+        "description": "Verify the server is running"
+      }
+    },
+    {
+      "name": "Dashboard",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/dashboard",
+        "description": "Total orders, revenue (delivered only), orders per status"
+      }
+    },
+    {
+      "name": "Create Order",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/orders",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerName\": \"Priya Sharma\",\n  \"phone\": \"9876543210\",\n  \"garments\": [\n    { \"type\": \"shirt\", \"quantity\": 3 },\n    { \"type\": \"saree\", \"quantity\": 1 }\n  ]\n}"
+        },
+        "description": "Creates a new order. Returns order ID, computed totals, and estimated delivery date."
+      }
+    },
+    {
+      "name": "Create Order — Validation Error",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/orders",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerName\": \"A\",\n  \"phone\": \"123\",\n  \"garments\": [\n    { \"type\": \"tuxedo\", \"quantity\": 0 }\n  ]\n}"
+        },
+        "description": "Should return 400 with a list of validation errors"
+      }
+    },
+    {
+      "name": "List All Orders",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/orders",
+        "description": "Returns all orders"
+      }
+    },
+    {
+      "name": "Filter by Status",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/orders?status=RECEIVED",
+          "query": [{ "key": "status", "value": "RECEIVED" }]
+        }
+      }
+    },
+    {
+      "name": "Search by Customer Name",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/orders?search=priya",
+          "query": [{ "key": "search", "value": "priya" }]
+        }
+      }
+    },
+    {
+      "name": "Filter by Garment Type",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/orders?garmentType=saree",
+          "query": [{ "key": "garmentType", "value": "saree" }]
+        }
+      }
+    },
+    {
+      "name": "Get Single Order",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/orders/{{order_id}}",
+        "description": "Replace {{order_id}} with a real ID from Create Order response"
+      }
+    },
+    {
+      "name": "Update Status → PROCESSING",
+      "request": {
+        "method": "PATCH",
+        "url": "{{base_url}}/orders/{{order_id}}/status",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"PROCESSING\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Update Status → READY",
+      "request": {
+        "method": "PATCH",
+        "url": "{{base_url}}/orders/{{order_id}}/status",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"READY\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Update Status → DELIVERED",
+      "request": {
+        "method": "PATCH",
+        "url": "{{base_url}}/orders/{{order_id}}/status",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"DELIVERED\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Update Status — Invalid Value",
+      "request": {
+        "method": "PATCH",
+        "url": "{{base_url}}/orders/{{order_id}}/status",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"SHIPPED\"\n}"
+        },
+        "description": "Should return 400"
+      }
+    }
+  ]
+}
